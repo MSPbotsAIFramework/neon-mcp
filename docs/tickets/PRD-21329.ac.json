@@ -1,0 +1,185 @@
+[
+  {
+    "id": "TC1",
+    "ac": "AC1",
+    "text": "Given a valid API key header, When neon_list_projects is called with no arguments, Then it returns the mocked project list (id/name/region/created_at) verbatim",
+    "type": "auto",
+    "tests": ["tests/test_tools.py::test_list_projects_returns_mocked_list"]
+  },
+  {
+    "id": "TC2",
+    "ac": "AC1",
+    "text": "Given cursor and limit arguments, When neon_list_projects is called, Then they are passed through as query params on GET /projects",
+    "type": "auto",
+    "tests": ["tests/test_tools.py::test_list_projects_passes_cursor_and_limit"]
+  },
+  {
+    "id": "TC3",
+    "ac": "AC2",
+    "text": "Given a project, When neon_list_branches is called, Then each returned branch has id/name/parent_id/default/protected/state",
+    "type": "auto",
+    "tests": ["tests/test_tools.py::test_list_branches_returns_fields"]
+  },
+  {
+    "id": "TC4",
+    "ac": "AC3",
+    "text": "Given a project, When neon_create_branch is called, Then it POSTs the branch body and returns the new branch id plus its tracking operation(s)",
+    "type": "auto",
+    "tests": ["tests/test_tools.py::test_create_branch_returns_id_and_operations"]
+  },
+  {
+    "id": "TC5",
+    "ac": "AC4",
+    "text": "Given a project and branch, When neon_delete_branch is called without confirm:true, Then no call reaches Neon and the tool returns a confirmation-required error",
+    "type": "auto",
+    "tests": ["tests/test_tools.py::test_delete_branch_without_confirm_is_rejected"]
+  },
+  {
+    "id": "TC6",
+    "ac": "AC5",
+    "text": "Given a project and branch, When neon_delete_branch is called with confirm:true, Then Neon's DELETE endpoint is called and the tracking operation(s) are returned",
+    "type": "auto",
+    "tests": ["tests/test_tools.py::test_delete_branch_with_confirm_calls_delete"]
+  },
+  {
+    "id": "TC7",
+    "ac": "AC6",
+    "text": "Given a project, When neon_list_endpoints is called, Then each returned endpoint has id/branch_id/type/state",
+    "type": "auto",
+    "tests": ["tests/test_tools.py::test_list_endpoints_returns_fields"]
+  },
+  {
+    "id": "TC8",
+    "ac": "AC7",
+    "text": "Given a project and branch, When neon_list_databases is called, Then each returned database has name and owner",
+    "type": "auto",
+    "tests": ["tests/test_tools.py::test_list_databases_returns_fields"]
+  },
+  {
+    "id": "TC9",
+    "ac": "AC8",
+    "text": "Given a project and branch, When neon_create_database is called with a name and owner, Then it POSTs that body and returns the created record",
+    "type": "auto",
+    "tests": ["tests/test_tools.py::test_create_database_returns_created_record"]
+  },
+  {
+    "id": "TC10",
+    "ac": "AC9",
+    "text": "Given a project and branch, When neon_list_roles is called, Then each returned role has a name and a protected flag",
+    "type": "auto",
+    "tests": ["tests/test_tools.py::test_list_roles_returns_fields"]
+  },
+  {
+    "id": "TC11",
+    "ac": "AC10",
+    "text": "Given a project and branch, When neon_create_role is called and the mocked response includes a generated password, Then the password is returned once in the tool result and never appears in a log line",
+    "type": "auto",
+    "tests": ["tests/test_tools.py::test_create_role_password_not_logged"]
+  },
+  {
+    "id": "TC12",
+    "ac": "AC11",
+    "text": "Given an existing project/branch/database/role, When neon_get_connection_uri is called, Then it returns the full connection URI",
+    "type": "auto",
+    "tests": ["tests/test_tools.py::test_get_connection_uri_returns_uri"]
+  },
+  {
+    "id": "TC13",
+    "ac": "AC14",
+    "text": "Given a database/role combination Neon reports as not found, When neon_get_connection_uri is called, Then it returns a structured not_found error, not a raw error",
+    "type": "auto",
+    "tests": ["tests/test_tools.py::test_get_connection_uri_not_found_is_structured"]
+  },
+  {
+    "id": "TC14",
+    "ac": "AC12",
+    "text": "Given a project and an operation id, When neon_get_operation is called, Then it returns that operation's current status",
+    "type": "auto",
+    "tests": ["tests/test_tools.py::test_get_operation_returns_status"]
+  },
+  {
+    "id": "TC15",
+    "ac": "AC12",
+    "text": "Given a project, When neon_list_operations is called, Then it returns the project's recent operations",
+    "type": "auto",
+    "tests": ["tests/test_tools.py::test_list_operations_returns_recent"]
+  },
+  {
+    "id": "TC16",
+    "ac": "AC13",
+    "text": "Given a request with no X-Neon-API-Key header, When any tool is called, Then the connector returns a structured 401 naming the required header and the mocked upstream records zero calls",
+    "type": "auto",
+    "tests": ["tests/test_middleware.py::test_missing_api_key_header_returns_401"]
+  },
+  {
+    "id": "TC17",
+    "ac": "AC14",
+    "text": "Given a mocked 401/403 upstream response, When any tool is called, Then it is surfaced as a structured unauthorized error, not a stack trace",
+    "type": "auto",
+    "tests": ["tests/test_api_client.py::test_401_403_mapped_to_unauthorized_envelope"]
+  },
+  {
+    "id": "TC18",
+    "ac": "AC14",
+    "text": "Given a mocked 404 upstream response (unknown project/branch/database/role id), When any tool is called, Then it is surfaced as a structured not_found error",
+    "type": "auto",
+    "tests": ["tests/test_api_client.py::test_404_mapped_to_not_found_envelope"]
+  },
+  {
+    "id": "TC19",
+    "ac": "AC14",
+    "text": "Given a mocked 429 upstream response on a read tool, When the call is retried per the backoff policy and still fails, Then it surfaces a structured rate_limited error within the call budget",
+    "type": "auto",
+    "tests": ["tests/test_api_client.py::test_429_retried_then_rate_limited_envelope"]
+  },
+  {
+    "id": "TC20",
+    "ac": "AC15",
+    "text": "Given two concurrent requests carrying two different X-Neon-API-Key values, When each is handled, Then each only sees the mocked response wired to its own key and no module-level state is shared between them",
+    "type": "auto",
+    "tests": ["tests/test_middleware.py::test_concurrent_requests_do_not_share_credentials"]
+  },
+  {
+    "id": "TC21",
+    "ac": "AC1",
+    "text": "Given a real free-tier Neon project, When projects/branches/endpoints/databases/roles are listed through the connector, Then the returned records match what the Neon Console shows (covers AC1, AC2, AC6, AC7, AC9)",
+    "type": "manual",
+    "steps": [
+      "Configure a real Neon API key in the X-Neon-API-Key header",
+      "Call neon_list_projects, neon_list_branches, neon_list_endpoints, neon_list_databases, neon_list_roles against that project",
+      "Open the same project in the Neon Console"
+    ],
+    "expect": "Every id/name/state field returned by the tools matches the Neon Console's display for the same project",
+    "result": "untested",
+    "notes": "needs a real vendor account; no Neon credentials are configured in this pipeline's environment (SOP: not a blocker)"
+  },
+  {
+    "id": "TC22",
+    "ac": "AC3",
+    "text": "Given a real Neon project, When a branch is created, polled to completion, and deleted with confirm:true, Then both the create and the delete are reflected in the Neon Console (covers AC3, AC5, AC12)",
+    "type": "manual",
+    "steps": [
+      "Call neon_create_branch on a real project",
+      "Poll neon_get_operation until status is terminal",
+      "Confirm the branch appears in the Neon Console",
+      "Call neon_delete_branch with confirm:true",
+      "Confirm the branch disappears from the Neon Console"
+    ],
+    "expect": "Branch appears after create+operation-finished, disappears after the confirmed delete",
+    "result": "untested",
+    "notes": "needs a real vendor account; no Neon credentials are configured in this pipeline's environment (SOP: not a blocker)"
+  },
+  {
+    "id": "TC23",
+    "ac": "AC11",
+    "text": "Given a real project/branch/database/role, When neon_get_connection_uri is called and the returned URI is used to open a Postgres connection, Then the connection succeeds",
+    "type": "manual",
+    "steps": [
+      "Call neon_get_connection_uri for a real project/branch/database/role",
+      "Run psql \"<returned uri>\" -c 'select 1'"
+    ],
+    "expect": "psql connects and returns 1 row",
+    "result": "untested",
+    "notes": "needs a real vendor account; no Neon credentials are configured in this pipeline's environment (SOP: not a blocker)"
+  }
+]
